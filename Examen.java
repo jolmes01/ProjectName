@@ -37,7 +37,7 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
      * Creates new form Examen
      */
     int x = 0, y = 0;
-    private boolean permiso = true, permisoOponente = false;
+    private boolean permiso = true, permisoRival = false;
     public String[] palabras;
     public int caracteres = 0;
     public JButton[][] tablero_jugador = new JButton[15][15];
@@ -57,7 +57,7 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
         tablero_rival = tbj;
         GeneraTablero(tabla_jugador, jPanel1, tablero_jugador);
         GeneraTablero(tabla_rival, jPanel2, tablero_rival);
-        if ("aceptadoOponente".equals(tipoJugador)) {
+        if ("aceptadoRival".equals(tipoJugador)) {
             ciclo();
         }
         super.pack();
@@ -181,12 +181,12 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
             if ("aceptado".equals(tipoJugador)) {
                 permiso = true;
             } else {
-                permisoOponente = false;
+                permisoRival = false;
             }
-            JOptionPane.showMessageDialog(rootPane, "Esperando Oponente");
+            JOptionPane.showMessageDialog(rootPane, "Esperando Rival");
             String datoInit = this.br.readLine();
             if ("inicia".equals(datoInit.substring(datoInit.indexOf("<%") + 2, datoInit.indexOf("%>")))) {
-                JOptionPane.showMessageDialog(rootPane, "Oponente conectado");
+                JOptionPane.showMessageDialog(rootPane, "Rival conectado");
             }
             System.out.println("INICIAR: " + datoInit.substring(datoInit.indexOf("<%") + 2, datoInit.indexOf("%>")));
         } catch (IOException ex) {
@@ -203,7 +203,7 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
         if ("aceptado".equals(tipoJugador) && permiso == false) {
             JOptionPane.showMessageDialog(rootPane, "No puedes tirar aún no es tu turno");
         }
-        if ("aceptadoOponente".equals(tipoJugador) && permisoOponente == false) {
+        if ("aceptadoRival".equals(tipoJugador) && permisoRival == false) {
             JOptionPane.showMessageDialog(rootPane, "No puedes tirar aún no es tu turno");
         }
         if (("aceptado".equals(tipoJugador) && permiso == true)) {
@@ -211,7 +211,7 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
             try {
                 tablero_rival[x][y].setEnabled(false);
                 sendDato("" + x + "," + y + ""); //Envía coordenada de tiro
-                respuesta = br.readLine(); //Recibe la respuesta del oponente para ver si le atino o no
+                respuesta = br.readLine(); //Recibe la respuesta del Rival para ver si le atino o no
                 // System.out.println("A-T RESPUESTA"+respuesta);
                 if (respuesta.indexOf("<%") > 0) {
                     respuesta = respuesta.substring(respuesta.indexOf("<%") + 2, respuesta.indexOf("%>"));
@@ -228,33 +228,33 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
                     tablero_rival[x][y].setText("o");
                     tablero_rival[x][y].setBackground(Color.GRAY);
                     permiso = false;
-                    ciclo(); //Lo deja a la espera de recibir un tiro del oponente
+                    ciclo(); //Lo deja a la espera de recibir un tiro del Rival
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Examen.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        if ("aceptadoOponente".equals(tipoJugador) && permisoOponente == true) {
+        if ("aceptadoRival".equals(tipoJugador) && permisoRival == true) {
             try {
-                System.out.println("ACEPTADOOPONENTE - TRUE");
+                System.out.println("ACEPTADORival - TRUE");
                 tablero_rival[x][y].setEnabled(false);
                 sendDato("" + x + "," + y + "");
                 respuesta = br.readLine();
                 if (respuesta.indexOf("<%") > 0) {
                     respuesta = respuesta.substring(respuesta.indexOf("<%") + 2, respuesta.indexOf("%>"));
                 }
-                System.out.println("SALIDA: " + respuesta + " BOOL: " + permisoOponente);
+                System.out.println("SALIDA: " + respuesta + " BOOL: " + permisoRival);
                 if ("true".equals(respuesta)) {
-                    System.out.println("TRUEOPONENTE");
+                    System.out.println("TRUERival");
                     tablero_rival[x][y].setText("x");
                     tablero_rival[x][y].setBackground(Color.red);
-                    permisoOponente = true;
+                    permisoRival = true;
                 }
                 if ("false".equals(respuesta)) {
-                    System.out.println("FALSEOPONENTE");
+                    System.out.println("FALSERival");
                     tablero_rival[x][y].setText("o");
                     tablero_rival[x][y].setBackground(Color.GRAY);
-                    permisoOponente = false;
+                    permisoRival = false;
                     ciclo();
                 }
             } catch (IOException ex) {
@@ -267,8 +267,8 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
         try {
             System.out.println("CICLO - " + respuesta + " - " + tipoJugador);
             //Mantiene el control sobre el jugador principal, peritiendole tirar continuamente hasta que falle
-            if ("aceptadoOponente".equals(tipoJugador) && "true".equals(respuesta)) {
-                    System.out.println("TRUEOponenteRecibe");
+            if ("aceptadoRival".equals(tipoJugador) && "true".equals(respuesta)) {
+                    System.out.println("TRUERivalRecibe");
                     eco = br.readLine();
                     eco = eco.substring(eco.indexOf("<%") + 2, eco.indexOf("%>"));
                     System.out.println("Posicion OBTENIDA DESCOM: " + eco);
@@ -277,20 +277,20 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
                         y = Integer.parseInt(eco.substring(eco.indexOf(",") + 1));
                         String dato;
                         //En esta parte se validara que le atine al barco sino tiene que mandar forzosamente un false para pasar
-                        //el control de los tiros al oponente
+                        //el control de los tiros al Rival
                         if (tabla_jugador[x][y] == 0) {
                             tablero_jugador[x][y].setBackground(Color.gray);
                             tablero_jugador[x][y].setText("o");
                             dato = "false";
-                            permisoOponente = true;
+                            permisoRival = true;
                         } else {
                             tablero_jugador[x][y].setBackground(Color.yellow);
                             tablero_jugador[x][y].setText("X");
                             tabla_jugador[x][y] = 0;
                             dato = "true";
-                            permisoOponente = false;
+                            permisoRival = false;
                         }
-                        System.out.println("INFO SALIDA\n DATO: " + dato+"\nPERMISOOP: "+permisoOponente);
+                        System.out.println("INFO SALIDA\n DATO: " + dato+"\nPERMISOOP: "+permisoRival);
                         respuesta = dato;
                         sendDato(respuesta);
                         if ("true".equals(dato)) {
@@ -298,10 +298,10 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
                         }
                     }
             }
-            //Quiere decir que el jugador principal fallo y ahora es el turno del Oponente de tirar
+            //Quiere decir que el jugador principal fallo y ahora es el turno del Rival de tirar
             if ("false".equals(respuesta)&&"aceptado".equals(tipoJugador)) {
                 System.out.println("FALSEPrincipalRecibe");
-                //Jugador principal mantiene a la espera de los tiros del oponente
+                //Jugador principal mantiene a la espera de los tiros del Rival
                     eco = br.readLine();
                     eco = eco.substring(eco.indexOf("<%") + 2, eco.indexOf("%>"));
                     System.out.println("Posicion OBTENIDA DESCOM: " + eco);
@@ -310,7 +310,7 @@ public class Examen extends javax.swing.JFrame implements ActionListener {
                         y = Integer.parseInt(eco.substring(eco.indexOf(",") + 1));
                         String dato;
                         //En esta parte se validara que le atine al barco sino tiene que mandar forzosamente un false para pasar
-                        //el control de los tiros al oponente
+                        //el control de los tiros al Rival
                         if (tabla_jugador[x][y] == 0) {
                             tablero_rival[x][y].setBackground(Color.gray);
                             tablero_rival[x][y].setText("o");
